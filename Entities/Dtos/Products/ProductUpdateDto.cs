@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete.TableModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace Entities.Concrete.Dtos.Products
         public decimal Price { get; set; }
 
         public string Description { get; set; }
+
+        public IFormFile Photo { get; set; }
 
         public static ProductUpdateDto Toproduct(Product product)
         {

@@ -74,15 +74,15 @@ namespace Bussines.Concrete
         {
             var model = ProductUpdateDto.Toproduct(dto);
             var value = GetById(dto.Id).Data;
-
-            //if (Photo == null)
-            //{
-            //    model.Photo = value.Photo;
-            //}
-            //else
-            //{
-            //    model.Photo = PictureHelper.UploadImage(Photo, webRootPath);
-            //}
+            string webrootpath = "";
+            if (model.Photo == null)
+            {
+                model.Photo = value.Photo;
+            }
+            else
+            {
+                model.Photo = PictureHelper.UploadImage(dto.Photo, webrootpath);
+            }
 
             model.LastUpdatedDate = DateTime.Now;
 
