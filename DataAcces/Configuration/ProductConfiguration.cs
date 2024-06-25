@@ -38,6 +38,13 @@ namespace DataAcces.Configuration
             builder.Property(x=>x.Title)
                 .IsRequired()
                 .HasMaxLength(200);
+
+            builder.HasKey(p => p.Id);
+            builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
+
+            builder.HasMany(p => p.UserProducts)
+                   .WithOne(up => up.Product)
+                   .HasForeignKey(up => up.ProductId);
         }
     }
 }

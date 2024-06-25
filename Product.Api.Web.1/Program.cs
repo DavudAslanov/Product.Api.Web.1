@@ -22,16 +22,24 @@ namespace Product.Api.Web._1
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
 
-            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //{
-            //    var connectionString = builder.Configuration.GetConnectionString("Local");
-            //    options.UseSqlServer(connectionString);
-            //});
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
 
             builder.Services.AddDbContext<ApplicationDbContext>();
             
@@ -79,6 +87,7 @@ namespace Product.Api.Web._1
 
             builder.Services.AddScoped<IProductDal, ProductDal>();
             builder.Services.AddScoped<IProductService, ProductManager>();
+            builder.Services.AddScoped<IUserProductService, UserProductService>();
 
             var app = builder.Build();
 
@@ -90,6 +99,8 @@ namespace Product.Api.Web._1
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthentication();
             app.UseAuthorization();

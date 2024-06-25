@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete.TableModels;
+using Entities.TableModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -10,7 +11,7 @@ namespace DataAcces.SqlServerDbContext
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=Localhost;Initial Catalog=ProductDB; Integrated Security = true;Encrypt=false");
+            optionsBuilder.UseSqlServer("Data Source=Localhost;Initial Catalog=ProductAllSDB; Integrated Security = true;Encrypt=false");
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,6 +20,10 @@ namespace DataAcces.SqlServerDbContext
         }
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<UserProduct> UserProducts { get; set; }
 
     }
 }
