@@ -25,5 +25,9 @@ namespace DataAcces.SqlServerDbContext
 
         public DbSet<UserProduct> UserProducts { get; set; }
 
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Message> Messages { get; set; }
+
     }
 }

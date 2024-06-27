@@ -21,6 +21,16 @@ namespace Entities.Concrete.Dtos.Products
 
         public string PhotoUrl { get; set; }
 
+        public string? Message { get; set; } = string.Empty;
+
+        public decimal? Views { get; set; } = 0;
+
+        public int Rating { get; set; }
+
+        public int CategoryID { get; set; }
+
+        public string CategoryName { get; set; }
+
         public static List<ProductDto> ToProduct(Product product)
         {
             ProductDto dto = new ProductDto()
@@ -30,7 +40,11 @@ namespace Entities.Concrete.Dtos.Products
                 Title = product.Title,
                 Price = product.Price,
                 Description = product.Description,
-                PhotoUrl=product.Photo
+                PhotoUrl=product.Photo,
+                Message = product.Message,
+                Rating = product.Rating,
+                Views=product.Views,
+                CategoryID= product.CategoryID,
 
             };
             List<ProductDto> productDtos = new List<ProductDto>();
@@ -47,7 +61,10 @@ namespace Entities.Concrete.Dtos.Products
                 Price = dto.Price,
                 Description = dto.Description,
                 Photo=dto.PhotoUrl,
-                
+                Message=dto.Message,
+                Rating=dto.Rating,
+                Views=dto.Views,
+                CategoryID= dto.CategoryID,
             };
             return product;
         }

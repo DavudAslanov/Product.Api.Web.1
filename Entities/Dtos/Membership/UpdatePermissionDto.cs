@@ -9,7 +9,10 @@ namespace Entities.Dtos.Membership
 {
     public class UpdatePermissionDto
     {
-        [Required(ErrorMessage = "UserName is Required")]
-        public string UserName { get; set; }
+        //[Required(ErrorMessage = "UserName is Required")]
+        //public string UserName { get; set; }
+
+        [Required(ErrorMessage = "Email is Required")]
+        public string Email { get; set; }
     }
 }

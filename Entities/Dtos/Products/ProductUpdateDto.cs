@@ -20,7 +20,13 @@ namespace Entities.Concrete.Dtos.Products
 
         public string Description { get; set; }
 
+        public string? Message { get; set; } = string.Empty;
+
+        public int Rating { get; set; } = 0;
+
         public IFormFile Photo { get; set; }
+
+        public int CategoryID { get; set; }
 
         public static ProductUpdateDto Toproduct(Product product)
         {
@@ -30,7 +36,10 @@ namespace Entities.Concrete.Dtos.Products
                Name = product.Name,
                Title = product.Title,
                Price = product.Price,
-               Description = product.Description
+               Description = product.Description,
+               Message = product.Message,
+               Rating = product.Rating,
+               CategoryID = product.CategoryID,
            };
             return dto;
         }
@@ -43,7 +52,9 @@ namespace Entities.Concrete.Dtos.Products
                 Name = product.Name,
                 Title = product.Title,
                 Price = product.Price,
-                Description = product.Description
+                Description = product.Description,
+                Message = product.Message,
+                CategoryID= product.CategoryID,
             };
             return dto;
         }

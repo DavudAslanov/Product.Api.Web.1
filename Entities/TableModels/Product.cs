@@ -7,6 +7,11 @@ namespace Entities.Concrete.TableModels
 {
     public class Product:BaseEntity
     {
+        public Product()
+        {
+            UserProducts=new HashSet<UserProduct>();
+        }
+
         public string Name { get; set; }
 
         public string Title { get; set; }
@@ -17,7 +22,16 @@ namespace Entities.Concrete.TableModels
 
         public string Photo { get; set; }
 
+        public int CategoryID { get; set; }
+
+        public string? Message { get; set; } = string.Empty;
+
+        public int Rating { get; set; } = 0;
+
+        public decimal? Views { get; set; } = 0;
         public ICollection<UserProduct> UserProducts { get; set; }
+
+        public virtual Category Category { get; set; }
 
         [NotMapped]
         public IFormFile FormFile { get; set; }

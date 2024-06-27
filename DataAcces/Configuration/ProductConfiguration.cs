@@ -27,6 +27,12 @@ namespace DataAcces.Configuration
                 .IsRequired()
                 .HasMaxLength(2000);
 
+            builder.Property(x => x.Views)
+                .HasPrecision(7,3);
+
+            builder.Property(x => x.Rating)
+                .HasMaxLength(5);
+
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -39,12 +45,20 @@ namespace DataAcces.Configuration
                 .IsRequired()
                 .HasMaxLength(200);
 
+            builder.Property(x => x.Message)
+                .HasMaxLength(3000);
+
             builder.HasKey(p => p.Id);
             builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
 
             builder.HasMany(p => p.UserProducts)
                    .WithOne(up => up.Product)
                    .HasForeignKey(up => up.ProductId);
+
+            builder.HasOne(p => p.Category)
+               .WithMany(c => c.Products)
+               .HasForeignKey(p => p.CategoryID)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

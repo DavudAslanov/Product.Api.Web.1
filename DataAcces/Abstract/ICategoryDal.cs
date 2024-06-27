@@ -1,6 +1,6 @@
 ﻿using Core.DataAcces.Abstract;
-using Entities.Concrete.Dtos.Products;
 using Entities.Concrete.TableModels;
+using Entities.TableModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAcces.Abstract
 {
-    public interface IProductDal:IBaseInterfeys<Product>
+    public interface ICategoryDal : IBaseInterfeys<Category>
     {
-        List<ProductDto> GetCategories();
     }
 }

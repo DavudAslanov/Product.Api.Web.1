@@ -14,5 +14,9 @@ namespace Entities.TableModels
 
         public int ProductId { get; set; }
         public  Product Product { get; set; }
+
+        public bool IsSelected { get; set; }
+
+        public int Rating { get; set; } = 0;
     }
 }

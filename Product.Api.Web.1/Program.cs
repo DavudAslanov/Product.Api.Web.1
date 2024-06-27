@@ -4,6 +4,7 @@ using Bussines.Concrete;
 using DataAcces.Abstract;
 using DataAcces.Concrete;
 using DataAcces.SqlServerDbContext;
+using FileUpload.API.Core.Utilities.Helpers.FileHelpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +24,6 @@ namespace Product.Api.Web._1
 
             builder.Services.AddControllers();
 
-
-
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -42,7 +41,7 @@ namespace Product.Api.Web._1
             });
 
             builder.Services.AddDbContext<ApplicationDbContext>();
-            
+
 
             // Add Identity
             builder.Services
@@ -88,6 +87,12 @@ namespace Product.Api.Web._1
             builder.Services.AddScoped<IProductDal, ProductDal>();
             builder.Services.AddScoped<IProductService, ProductManager>();
             builder.Services.AddScoped<IUserProductService, UserProductService>();
+            builder.Services.AddScoped<ICategoryDal, CategoryDal>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IMessageDal, MessageDal>();
+            builder.Services.AddScoped<IMessageService,MessageService>();
+            builder.Services.AddScoped<IRaitingService, RaitingService>();
+            
 
             var app = builder.Build();
 

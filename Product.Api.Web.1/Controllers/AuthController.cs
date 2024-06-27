@@ -48,34 +48,33 @@ namespace Product.Api.Web._1.Controllers
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var isExistsUser = await _userManager.FindByNameAsync(registerDto.UserName);
+            var existingUser = await _userManager.FindByNameAsync(registerDto.UserName);
 
-            if (isExistsUser != null)
-                return BadRequest("UserName Already Exists");
-
-            IdentityUser newUser = new IdentityUser()
+            if (existingUser != null)
             {
-                Email = registerDto.Email,
-                UserName = registerDto.UserName,
-                SecurityStamp = Guid.NewGuid().ToString(),
-            };
-
-            var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
-
-            if (!createUserResult.Succeeded)
-            {
-                var errorString = "User Creation Failed Beacause: ";
-                foreach (var error in createUserResult.Errors)
-                {
-                    errorString += " # " + error.Description;
-                }
-                return BadRequest(errorString);
+                return BadRequest("Email already exists");
             }
 
-            // Add a Default USER Role to all users
-            await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER);
+            var newUser = new IdentityUser
+            {
+                UserName = registerDto.UserName,
+                Email = registerDto.Email,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
 
-            return Ok("User Created Successfully");
+            var result = await _userManager.CreateAsync(newUser, registerDto.Password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER); // Default USER role
+
+                return Ok("User created successfully");
+            }
+            else
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest($"Failed to create user: {errors}");
+            }
         }
 
         // Route -> Login
@@ -83,33 +82,37 @@ namespace Product.Api.Web._1.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var user = await _userManager.FindByNameAsync(loginDto.UserName);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
-            if (user is null)
-                return Unauthorized("Invalid Credentials");
+            if (user == null)
+            {
+                return Unauthorized("Invalid email or password");
+            }
 
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!isPasswordCorrect)
-                return Unauthorized("Invalid Credentials");
+            {
+                return Unauthorized("Invalid email or password");
+            }
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            var authClaims = new List<Claim>
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim("JWTID", Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("JWTID", Guid.NewGuid().ToString())
             };
 
             foreach (var userRole in userRoles)
             {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
             }
 
-            var token = GenerateNewJsonWebToken(authClaims);
+            var token = GenerateNewJsonWebToken(claims);
 
-            return Ok(token);
+            return Ok(new { Token = token });
         }
 
         private string GenerateNewJsonWebToken(List<Claim> claims)
@@ -134,10 +137,12 @@ namespace Product.Api.Web._1.Controllers
         [Route("make-admin")]
         public async Task<IActionResult> MakeAdmin([FromBody] UpdatePermissionDto updatePermissionDto)
         {
-            var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+            //var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+
+            var user = await _userManager.FindByEmailAsync(updatePermissionDto.Email);
 
             if (user is null)
-                return BadRequest("Invalid User name!!!!!!!!");
+                return BadRequest("Invalid Email!!!!!!!!");
 
             await _userManager.AddToRoleAsync(user, StaticUserRoles.ADMIN);
 
@@ -149,7 +154,8 @@ namespace Product.Api.Web._1.Controllers
         [Route("make-owner")]
         public async Task<IActionResult> MakeOwner([FromBody] UpdatePermissionDto updatePermissionDto)
         {
-            var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+            //var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+            var user = await _userManager.FindByEmailAsync(updatePermissionDto.Email);
 
             if (user is null)
                 return BadRequest("Invalid User name!!!!!!!!");
@@ -157,6 +163,24 @@ namespace Product.Api.Web._1.Controllers
             await _userManager.AddToRoleAsync(user, StaticUserRoles.OWNER);
 
             return Ok("User is now an Owner");
+        }
+
+        public async Task<T> RetryHttpRequest<T>(Func<Task<T>> requestFunc, int maxRetryCount = 3)
+        {
+            int retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    return await requestFunc();
+                }
+                catch (HttpRequestException ex) when (retryCount < maxRetryCount)
+                {
+
+                    retryCount++;
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+            }
         }
     }
 }

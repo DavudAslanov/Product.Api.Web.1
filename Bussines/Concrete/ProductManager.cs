@@ -9,6 +9,7 @@ using Entities.Concrete.TableModels;
 using FileUpload.API.Core.Utilities.Helpers.FileHelpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,22 +46,7 @@ namespace Bussines.Concrete
 
         public IDataResult<List<ProductDto>> GetAll()
         {
-            var models = _productDal.GetAll(x => x.Deleted == 0);
-            List<ProductDto> result = new List<ProductDto>();
-            foreach (var model in models)
-            {
-                ProductDto dto = new ProductDto()
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Title = model.Title,
-                    Description = model.Description,
-                    Price = model.Price,
-                    PhotoUrl=model.Photo
-                };
-                result.Add(dto);
-            }
-            return new SuccessDataResult<List<ProductDto>>(result);
+            return new SuccessDataResult<List<ProductDto>>(_productDal.GetCategories());
         }
 
         public IDataResult<Product> GetById(int id)
