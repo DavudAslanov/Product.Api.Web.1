@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete.TableModels;
+using Entities.Concrete.TableModels.Membership;
 using Entities.TableModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +7,8 @@ using System.Reflection;
 
 namespace DataAcces.SqlServerDbContext
 {
-    public class ApplicationDbContext:IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=Localhost;Initial Catalog=ProductAllSDB; Integrated Security = true;Encrypt=false");

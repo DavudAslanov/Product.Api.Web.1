@@ -4,6 +4,7 @@ using Bussines.Concrete;
 using DataAcces.Abstract;
 using DataAcces.Concrete;
 using DataAcces.SqlServerDbContext;
+using Entities.Concrete.TableModels.Membership;
 using FileUpload.API.Core.Utilities.Helpers.FileHelpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -45,7 +46,7 @@ namespace Product.Api.Web._1
 
             // Add Identity
             builder.Services
-                .AddIdentity<IdentityUser, IdentityRole>()
+                .AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
