@@ -19,7 +19,7 @@ namespace Entities.Dtos.Membership
         [Required(ErrorMessage = "Gender is Required")]
         public byte Gender { get; set; }
 
-        //[Required(ErrorMessage = "UserName is Required")]
+        [Required(ErrorMessage = "UserName is Required")]
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Email is Required")]
@@ -28,6 +28,8 @@ namespace Entities.Dtos.Membership
         [Required(ErrorMessage = "Password is Required")]
         public string Password { get; set; }
 
-        //public IFormFile Photo { get; set; }
+        public int Number { get; set; }
+
+        public IFormFile? Photo { get; set; } 
     }
 }

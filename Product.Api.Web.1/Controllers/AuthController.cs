@@ -52,7 +52,7 @@ namespace Product.Api.Web._1.Controllers
         // Route -> Register
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
         {
             var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
             if (existingUserByEmail != null)
@@ -65,19 +65,21 @@ namespace Product.Api.Web._1.Controllers
                 FirstName = registerDto.FirstName,
                 UserName = registerDto.UserName,
                 LastName = registerDto.LastName,
+                Number=registerDto.Number,
                 Email = registerDto.Email,
                 Gender = registerDto.Gender,
-                Password = registerDto.Password,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
             var result = await _userManager.CreateAsync(newUser, registerDto.Password);
 
             if (result.Succeeded)
             {
-                //if (registerDto.Photo != null)
-                //{
-                //    var photoPath = await SavePhotoAsync(registerDto.Photo); 
-                //}
+                //string photoPath = null;
+                if (registerDto.Photo != null)
+                {
+                    var photoPath = await SavePhotoAsync(registerDto.Photo);
+                }
+                
                 await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER);
 
                 return Ok("User created successfully");
@@ -87,27 +89,27 @@ namespace Product.Api.Web._1.Controllers
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 return BadRequest($"Failed to create user: {errors}");
             }
-            // async Task<string> SavePhotoAsync(IFormFile photo)
-            //{
-            //    if (photo == null || photo.Length == 0)
-            //        return null;
+            async Task<string> SavePhotoAsync(IFormFile photo)
+            {
+                if (photo == null || photo.Length == 0)
+                    return null;
 
-            //    //var uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
-            //    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                //var uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 
-            //    if (!Directory.Exists(uploadsFolder))
-            //        Directory.CreateDirectory(uploadsFolder);
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
 
-            //    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
-            //    var filePath = Path.Combine(uploadsFolder, fileName);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
 
-            //    using (var stream = new FileStream(filePath, FileMode.Create))
-            //    {
-            //        await photo.CopyToAsync(stream);
-            //    }
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(stream);
+                }
 
-            //    return "/Images/" + fileName; 
-            //}
+                return "/Images/" + fileName;
+            }
         }
 
         // Route -> Login

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Entities.Concrete.TableModels.Membership
 {
     public class ApplicationUser:IdentityUser
@@ -7,12 +9,14 @@ namespace Entities.Concrete.TableModels.Membership
 
         public string LastName { get; set; }
 
-        public string UserName { get; set; }
         public string Email { get; set; }
 
         public byte Gender { get; set; }
 
-        public string Password { get; set; }
+        public int Number { get; set; }
+
+        [NotMapped]
+        public IFormFile? Photo { get; set; }
 
     }
 }
