@@ -1,9 +1,12 @@
 ﻿using Bussines.Abstract;
 using Core.BaseMessages;
 using DataAcces.SqlServerDbContext;
+using Entities.Concrete.TableModels.Membership;
+using Entities.Dtos.Membership;
 using Entities.TableModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -17,13 +20,15 @@ namespace Product.Api.Web._1.Controllers
         private readonly IRaitingService _ratingService;
         private readonly IUserProductService _userProductService;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserController(IProductService productService, IRaitingService ratingService, IUserProductService userProductService, ApplicationDbContext context)
+        public UserController(IProductService productService, IRaitingService ratingService, IUserProductService userProductService, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _productService = productService;
             _ratingService = ratingService;
             _userProductService = userProductService;
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpPost("SelectProduct")]
@@ -139,6 +144,79 @@ namespace Product.Api.Web._1.Controllers
             }
 
             return BadRequest(result);
+        }
+
+        [Authorize] 
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UserProfileUpdateDto updateDto)
+        {
+            try
+            {
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+                user.FirstName = updateDto.FirstName;
+                user.LastName = updateDto.LastName;
+                user.Gender = updateDto.Gender;
+                user.Email = updateDto.Email;
+                user.Photo= updateDto.Photo;
+                user.Number= updateDto.Number;
+
+
+                if (updateDto.Photo != null)
+                {
+                    if(updateDto.Photo != null)
+                    {
+                        var photoPath = await SavePhotoAsync(updateDto.Photo);
+                    }
+                    else
+                    {
+                        return BadRequest("Failed to update profile photo");
+                    }
+
+                }
+              
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return Ok("Profile updated successfully");
+                }
+                else
+                {
+                    return BadRequest("Failed to update profile");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+            async Task<string> SavePhotoAsync(IFormFile photo)
+            {
+                if (photo == null || photo.Length == 0)
+                    return null;
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(stream);
+                }
+
+                return "/Images/" + fileName;
+            }
         }
 
         public async Task<T> RetryHttpRequest<T>(Func<Task<T>> requestFunc, int maxRetryCount = 3)

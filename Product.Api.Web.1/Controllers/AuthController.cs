@@ -117,41 +117,6 @@ namespace Product.Api.Web._1.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            ////var user = await _userManager.FindByEmailAsync(loginDto.Email);
-            //var user = await _userManager.Users
-            //.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-
-            //if (user == null)
-            //{
-            //    return Unauthorized("Invalid email or password");
-            //}
-
-            //var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-
-            //if (!isPasswordCorrect)
-            //{
-            //    return Unauthorized("Invalid email or password");
-            //}
-
-            //var userRoles = await _userManager.GetRolesAsync(user);
-
-            //var claims = new List<Claim>
-            //{
-            //    new Claim(ClaimTypes.NameIdentifier, user.Id),
-            //    new Claim(ClaimTypes.Name, user.UserName),
-            //    new Claim("JWTID", Guid.NewGuid().ToString())
-            //};
-
-            //foreach (var userRole in userRoles)
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, userRole));
-            //}
-
-            //var token = GenerateNewJsonWebToken(claims);
-
-            //return Ok(new { Token = token });
-
-
             var user = await _userManager.Users
             .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
@@ -178,6 +143,7 @@ namespace Product.Api.Web._1.Controllers
             new Claim("Gender", user.Gender.ToString()),
             new Claim("FullName", $"{user.FirstName} {user.LastName}"),
              new Claim("JWTID", jti.ToString()),
+               new Claim("Number", user.Number.ToString()),
             new Claim("JWTID", Guid.NewGuid().ToString())
             };
 
