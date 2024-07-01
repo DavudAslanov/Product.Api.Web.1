@@ -2,6 +2,7 @@
 using Core.BaseMessages;
 using DataAcces.SqlServerDbContext;
 using Entities.Concrete.Dtos.Products;
+using Entities.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +18,15 @@ namespace ProductWeb.Apis.Controllers
         private readonly IRaitingService _ratingService;
         private readonly IUserProductService _userProductService;
         private readonly ApplicationDbContext _context;
+        private readonly IBackgroundJobService _backgroundJobService;
 
-        public ProductController(IProductService productService, IUserProductService userProductService, ApplicationDbContext context, IRaitingService ratingService)
+        public ProductController(IProductService productService, IUserProductService userProductService, ApplicationDbContext context, IRaitingService ratingService, IBackgroundJobService backgroundJobService)
         {
             _productService = productService;
             _userProductService = userProductService;
             _context = context;
             _ratingService = ratingService;
+            _backgroundJobService = backgroundJobService;
         }
 
         [HttpGet]
@@ -88,6 +91,60 @@ namespace ProductWeb.Apis.Controllers
             return BadRequest(result);
         }
 
+        [HttpPost("set-discount")]
+        [Authorize(Roles = $"{StaticUserRoles.ADMIN},{StaticUserRoles.OWNER}")]
+        public async Task<IActionResult> SetDiscount([FromForm] ProductSetDiscountDto dto)
+        {
+            // Ürünü veritabanından bulma
+            var product = await _context.Products.FindAsync(dto.Id);
+
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+
+            // İndirimli fiyat belirtilmişse güncelle, belirtilmemişse mevcut fiyatı koru
+            if (dto.DiscountPrice > 0)
+            {
+                product.CurrentPrice = dto.DiscountPrice;
+                product.DiscountEndTime = DateTime.UtcNow.AddDays(dto.DiscountDurationInDays);
+
+                // İndirimin bitiş zamanında fiyatın geri alınması için bir arka plan işi planlama
+                //_backgroundJobService.ScheduleRevertPriceJob(product.Id, product.DiscountEndTime.Value);
+                Task.Delay(dto.DiscountDurationInDays * 24 * 60 * 60 * 1000) // ms cinsinden süre
+                .ContinueWith(async (_) =>
+                {
+                    var existingProduct = await _context.Products.FindAsync(dto.Id);
+                        if (existingProduct != null && existingProduct.DiscountEndTime.HasValue && existingProduct.DiscountEndTime.Value <= DateTime.UtcNow)
+                    {
+                        existingProduct.CurrentPrice = existingProduct.Price;
+                        existingProduct.DiscountEndTime = null;
+                        await _context.SaveChangesAsync();
+                }
+                });
+            }
+            else
+            {
+                // İndirimli fiyat belirtilmemişse, mevcut fiyatı orijinal fiyat olarak ayarla
+                product.CurrentPrice = product.Price;
+                product.DiscountEndTime = null;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Discount set successfully");
+        }
+
+        [HttpGet("discounted-products")]
+        public async Task<IActionResult> GetDiscountedProducts()
+        {
+            var discountedProducts = await _context.Products
+                .Where(p => p.CurrentPrice < p.Price) 
+                .ToListAsync();
+
+            return Ok(discountedProducts);
+        }
+
         public async Task<T> RetryHttpRequest<T>(Func<Task<T>> requestFunc, int maxRetryCount = 3)
         {
             int retryCount = 0;
@@ -99,7 +156,7 @@ namespace ProductWeb.Apis.Controllers
                 }
                 catch (HttpRequestException ex) when (retryCount < maxRetryCount)
                 {
-                   
+
                     retryCount++;
                     await Task.Delay(TimeSpan.FromSeconds(5));
                 }

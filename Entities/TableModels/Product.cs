@@ -10,6 +10,7 @@ namespace Entities.Concrete.TableModels
         public Product()
         {
             UserProducts=new HashSet<UserProduct>();
+            CurrentPrice = Price;
         }
 
         public string Name { get; set; }
@@ -17,6 +18,8 @@ namespace Entities.Concrete.TableModels
         public string Title { get; set; }
 
         public decimal Price { get; set; }
+        public decimal CurrentPrice { get; set; }
+        public DateTime? DiscountEndTime { get; set; }
 
         public string Description { get; set; }
 

@@ -219,6 +219,8 @@ namespace DataAcces.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(7,2)", precision: 7, scale: 2, nullable: false),
+                    CurrentPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m),
+                    DiscountEndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     Photo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoryID = table.Column<int>(type: "int", nullable: false),

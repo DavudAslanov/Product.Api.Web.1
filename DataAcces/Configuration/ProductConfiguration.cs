@@ -21,14 +21,14 @@ namespace DataAcces.Configuration
 
             builder.Property(x => x.Id)
                 .IsRequired()
-                .UseIdentityColumn(seed:DefaultConstantValue.DEFAULT_PRIMARY_KEY_SEED,increment:1);
+                .UseIdentityColumn(seed: DefaultConstantValue.DEFAULT_PRIMARY_KEY_SEED, increment: 1);
 
             builder.Property(x => x.Description)
                 .IsRequired()
                 .HasMaxLength(2000);
 
             builder.Property(x => x.Views)
-                .HasPrecision(7,3);
+                .HasPrecision(7, 3);
 
             builder.Property(x => x.Rating)
                 .HasMaxLength(5);
@@ -37,11 +37,11 @@ namespace DataAcces.Configuration
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(x=>x.Price)
+            builder.Property(x => x.Price)
                 .IsRequired()
-                .HasPrecision(7,2);
+                .HasPrecision(7, 2);
 
-            builder.Property(x=>x.Title)
+            builder.Property(x => x.Title)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -54,6 +54,9 @@ namespace DataAcces.Configuration
             builder.HasMany(p => p.UserProducts)
                    .WithOne(up => up.Product)
                    .HasForeignKey(up => up.ProductId);
+
+            builder.Property(p => p.CurrentPrice)
+            .HasDefaultValue(0);
 
             builder.HasOne(p => p.Category)
                .WithMany(c => c.Products)

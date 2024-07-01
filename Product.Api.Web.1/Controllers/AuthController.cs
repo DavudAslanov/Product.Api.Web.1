@@ -30,7 +30,7 @@ namespace Product.Api.Web._1.Controllers
             _configuration = configuration;
         }
 
-        // Route For Seeding my roles to DB
+
         [HttpPost]
         [Route("seed-roles")]
         public async Task<IActionResult> SeedRoles()
@@ -65,7 +65,7 @@ namespace Product.Api.Web._1.Controllers
                 FirstName = registerDto.FirstName,
                 UserName = registerDto.UserName,
                 LastName = registerDto.LastName,
-                Number=registerDto.Number,
+                Number = registerDto.Number,
                 Email = registerDto.Email,
                 Gender = registerDto.Gender,
                 SecurityStamp = Guid.NewGuid().ToString()
@@ -79,7 +79,7 @@ namespace Product.Api.Web._1.Controllers
                 {
                     var photoPath = await SavePhotoAsync(registerDto.Photo);
                 }
-                
+
                 await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER);
 
                 return Ok("User created successfully");
@@ -112,7 +112,7 @@ namespace Product.Api.Web._1.Controllers
             }
         }
 
-        // Route -> Login
+        //Route -> Login
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -135,21 +135,24 @@ namespace Product.Api.Web._1.Controllers
             var userRoles = await _userManager.GetRolesAsync(user);
 
             int jti = GenerateIntegerJti();
+            int jwtId = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("User Id", user.Id),
+            new Claim("UserName" ,user.UserName),
+            new Claim("Email", user.Email),
             new Claim("Gender", user.Gender.ToString()),
             new Claim("FullName", $"{user.FirstName} {user.LastName}"),
-             new Claim("JWTID", jti.ToString()),
-               new Claim("Number", user.Number.ToString()),
-            new Claim("JWTID", Guid.NewGuid().ToString())
-            };
+            new Claim("Number", user.Number.ToString()),
+            new Claim("JWTID", jwtId.ToString()),
+            new Claim("Roles", string.Join(",", userRoles))
 
-             int GenerateIntegerJti()
+            };
+            
+
+            int GenerateIntegerJti()
             {
-                
+
                 return (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             }
 
@@ -162,6 +165,7 @@ namespace Product.Api.Web._1.Controllers
 
             return Ok(new { Token = token });
         }
+
 
         private string GenerateNewJsonWebToken(List<Claim> claims)
         {

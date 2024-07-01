@@ -18,6 +18,9 @@ namespace Entities.Concrete.Dtos.Products
 
         public decimal Price { get; set; }
 
+        public decimal DiscountPrice { get; set; }
+        public int DiscountDurationInDays { get; set; }
+
         public string Description { get; set; }
 
         public string? Message { get; set; } = string.Empty;

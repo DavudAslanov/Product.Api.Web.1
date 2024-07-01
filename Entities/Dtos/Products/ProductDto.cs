@@ -17,6 +17,9 @@ namespace Entities.Concrete.Dtos.Products
 
         public decimal Price { get; set; }
 
+        public decimal CurrentPrice { get; set; }
+        public DateTime? DiscountEndTime { get; set; }
+
         public string Description { get; set; }
 
         public string PhotoUrl { get; set; }
@@ -39,6 +42,8 @@ namespace Entities.Concrete.Dtos.Products
                 Name = product.Name,
                 Title = product.Title,
                 Price = product.Price,
+                CurrentPrice = product.CurrentPrice,
+                DiscountEndTime = product.DiscountEndTime,
                 Description = product.Description,
                 PhotoUrl=product.Photo,
                 Message = product.Message,
@@ -59,6 +64,8 @@ namespace Entities.Concrete.Dtos.Products
                 Name = dto.Name,
                 Title = dto.Title,
                 Price = dto.Price,
+                CurrentPrice= dto.CurrentPrice,
+                DiscountEndTime = dto.DiscountEndTime,
                 Description = dto.Description,
                 Photo=dto.PhotoUrl,
                 Message=dto.Message,

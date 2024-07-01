@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAcces.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240630035435_Initial")]
+    [Migration("20240630234151_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -124,6 +124,11 @@ namespace DataAcces.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("CurrentPrice")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<int>("Deleted")
                         .HasColumnType("int");
 
@@ -131,6 +136,9 @@ namespace DataAcces.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("DiscountEndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime2");

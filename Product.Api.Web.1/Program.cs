@@ -6,9 +6,11 @@ using DataAcces.Concrete;
 using DataAcces.SqlServerDbContext;
 using Entities.Concrete.TableModels.Membership;
 using FileUpload.API.Core.Utilities.Helpers.FileHelpers;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
@@ -42,6 +44,12 @@ namespace Product.Api.Web._1
             });
 
             builder.Services.AddDbContext<ApplicationDbContext>();
+
+            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            //options.UseSqlServer(builder.Configuration.GetConnectionString("Local")));
+
+            //builder.Services.AddHangfire(config => config.UseSqlServerStorage(builder.Configuration.GetConnectionString("Local")));
+            //builder.Services.AddHangfireServer();
 
 
             // Add Identity
@@ -93,7 +101,8 @@ namespace Product.Api.Web._1
             builder.Services.AddScoped<IMessageDal, MessageDal>();
             builder.Services.AddScoped<IMessageService,MessageService>();
             builder.Services.AddScoped<IRaitingService, RaitingService>();
-            
+            builder.Services.AddScoped<IBackgroundJobService, BackgroundJobService>();
+
 
             var app = builder.Build();
 
@@ -110,6 +119,9 @@ namespace Product.Api.Web._1
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //app.UseHangfireDashboard();
+            //app.UseHangfireServer();
 
 
             app.MapControllers();
